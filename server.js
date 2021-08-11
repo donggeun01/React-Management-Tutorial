@@ -1,49 +1,26 @@
 const express = require('express');
 const bodyParser = require("body-parser");
 const app = express()
-
+const mysql = require("mysql")
+const fs = require("fs");
 const port = process.env.PORT || 5000;
+
+const data = fs.readFileSync("./database.json");
+const conf = JSON.parse(data);
+const connection = mysql.createConnection(conf);
+
+connection.connect();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true}));
 
 app.get("/api/customers", (req, res) =>  {
-    res.send([
-
-        {
-            id: 1,
-            image: "https://placeimg.com/64/64/1",
-            name: '홍길동',
-            birthday: '9801122',
-            gender: '남자',
-            job: '대학생'
-        },
-        {
-            id: 2,
-            image: "https://placeimg.com/64/64/2",
-            name: '이순신',
-            birthday: '9891122',
-            gender: '남자',
-            job: '대학생'
-        },
-        {
-            id: 3,
-            image: "https://placeimg.com/64/64/3",
-            name: '세종대왕',
-            birthday: '9401122',
-            gender: '남자',
-            job: 'King'
-        },
-        {
-            id: 4,
-            image: "https://placeimg.com/64/64/4",
-            name: '홍길도',
-            birthday: '9501122',
-            gender: '남자',
-            job: '프로그래머'
+    connection.query(
+        `SELECT * FROM customer`, (err, rows) => {
+            if(err) res.send(err);
+            res.send(rows);
         }
-
-    ]);
+    )
 })
 
 
